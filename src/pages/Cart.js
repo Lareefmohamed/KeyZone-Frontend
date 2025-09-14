@@ -48,6 +48,15 @@ const Cart = () => {
     navigate('/checkout');
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-LK', {
+      style: 'currency',
+      currency: 'LKR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price);
+  };
+
   if (!cart.items || cart.items.length === 0) {
     return (
       <Container maxWidth="md" sx={{ py: 4, textAlign: 'center' }}>
@@ -88,7 +97,7 @@ const Cart = () => {
                 {item.product.name}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                ${item.price} each
+                {formatPrice(item.price)} each
               </Typography>
             </Grid>
             <Grid item xs={12} sm={3}>
@@ -114,7 +123,7 @@ const Cart = () => {
             <Grid item xs={12} sm={1}>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                 <Typography variant="h6" color="primary">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  {formatPrice(item.price * item.quantity)}
                 </Typography>
                 <IconButton 
                   color="error" 
@@ -132,7 +141,7 @@ const Cart = () => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
           <Typography variant="h6">Total:</Typography>
           <Typography variant="h6" color="primary">
-            ${cart.total?.toFixed(2)}
+            {formatPrice(cart.total)}
           </Typography>
         </Box>
         <Divider sx={{ my: 2 }} />

@@ -46,6 +46,15 @@ const Orders = () => {
     });
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-LK', {
+      style: 'currency',
+      currency: 'LKR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
@@ -87,11 +96,11 @@ const Orders = () => {
                   <Box>
                     <Typography variant="body1">{item.product_id.name}</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Qty: {item.quantity} × ${item.price}
+                      Qty: {item.quantity} × {formatPrice(item.price)}
                     </Typography>
                   </Box>
                   <Typography variant="body1">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatPrice(item.price * item.quantity)}
                   </Typography>
                 </Box>
               ))}
@@ -101,7 +110,7 @@ const Orders = () => {
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h6">Total:</Typography>
                 <Typography variant="h6" color="primary">
-                  ${order.total_amount.toFixed(2)}
+                  {formatPrice(order.total_amount)}
                 </Typography>
               </Box>
             </Paper>

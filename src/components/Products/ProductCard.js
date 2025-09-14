@@ -72,9 +72,11 @@ const ProductCard = ({ product }) => {
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-LK', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'LKR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(price);
   };
 
@@ -373,13 +375,7 @@ const ProductCard = ({ product }) => {
           {truncateDescription(product.description)}
         </Typography>
 
-        {/* Rating (placeholder for future feature) */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, opacity: 0.7 }}>
-          <Star sx={{ color: '#FFD700', fontSize: 16, mr: 0.5 }} />
-          <Typography variant="body2" color="text.secondary">
-            4.5 (125 reviews)
-          </Typography>
-        </Box>
+        
       </CardContent>
 
       {/* Actions */}

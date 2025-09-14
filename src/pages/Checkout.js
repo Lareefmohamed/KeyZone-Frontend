@@ -15,6 +15,15 @@ const Checkout = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-LK', {
+      style: 'currency',
+      currency: 'LKR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price);
+  };
+
   const handlePlaceOrder = async () => {
     if (!cart.items || cart.items.length === 0) {
       setError('Your cart is empty');
@@ -81,11 +90,11 @@ const Checkout = () => {
             <Box>
               <Typography variant="body1">{item.product.name}</Typography>
               <Typography variant="body2" color="text.secondary">
-                Qty: {item.quantity} × ${item.price}
+                Qty: {item.quantity} × {formatPrice(item.price)}
               </Typography>
             </Box>
             <Typography variant="body1">
-              ${(item.price * item.quantity).toFixed(2)}
+              {formatPrice(item.price * item.quantity)}
             </Typography>
           </Box>
         ))}
@@ -95,7 +104,7 @@ const Checkout = () => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="h6">Total:</Typography>
           <Typography variant="h6" color="primary">
-            ${cart.total?.toFixed(2)}
+            {formatPrice(cart.total)}
           </Typography>
         </Box>
       </Paper>
@@ -115,7 +124,7 @@ const Checkout = () => {
           onClick={handlePlaceOrder}
           disabled={loading}
         >
-          {loading ? <CircularProgress size={24} /> : `Place Order - $${cart.total?.toFixed(2)}`}
+          {loading ? <CircularProgress size={24} /> : `Place Order - ${formatPrice(cart.total)}`}
         </Button>
       </Paper>
     </Container>
@@ -123,4 +132,3 @@ const Checkout = () => {
 };
 
 export default Checkout;
-

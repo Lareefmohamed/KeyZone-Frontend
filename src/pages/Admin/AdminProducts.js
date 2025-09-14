@@ -177,9 +177,11 @@ const AdminProducts = () => {
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-LK', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'LKR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(price);
   };
 
@@ -371,12 +373,13 @@ const AdminProducts = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Price ($)"
+                  label="Price (Rs)"
                   type="number"
                   value={formData.price}
                   onChange={(e) => handleInputChange('price', e.target.value)}
                   required
                   inputProps={{ min: 0, step: 0.01 }}
+                  helperText="Price in Sri Lankan Rupees"
                 />
               </Grid>
               <Grid item xs={12} sm={6}>

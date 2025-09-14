@@ -77,6 +77,15 @@ const AdminDashboard = () => {
     }
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-LK', {
+      style: 'currency',
+      currency: 'LKR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price);
+  };
+
   const StatCard = ({ title, value, icon, color = 'primary' }) => (
     <Card sx={{ height: '100%', background: `linear-gradient(135deg, ${color === 'primary' ? 'rgba(255, 215, 0, 0.1)' : 'rgba(26, 26, 26, 0.8)'} 0%, rgba(26, 26, 26, 0.8) 100%)`, border: '1px solid rgba(255, 215, 0, 0.2)' }}>
       <CardContent sx={{ textAlign: 'center', py: 3 }}>
@@ -135,7 +144,7 @@ const AdminDashboard = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Revenue"
-            value={`$${stats.totalRevenue.toFixed(2)}`}
+            value={formatPrice(stats.totalRevenue)}
             icon={<TrendingUp />}
             color="primary"
           />
@@ -206,24 +215,8 @@ const AdminDashboard = () => {
                   secondary="Add, edit, and remove products"
                 />
               </ListItem>
-              <ListItem component={Link} to="/admin/orders" sx={{ pl: 0, '&:hover': { bgcolor: 'rgba(255, 215, 0, 0.1)' } }}>
-                <ListItemIcon>
-                  <ShoppingCart color="primary" />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="Order Management" 
-                  secondary="View and manage customer orders"
-                />
-              </ListItem>
-              <ListItem component={Link} to="/admin/users" sx={{ pl: 0, '&:hover': { bgcolor: 'rgba(255, 215, 0, 0.1)' } }}>
-                <ListItemIcon>
-                  <People color="primary" />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="User Management" 
-                  secondary="Manage customer accounts"
-                />
-              </ListItem>
+              
+              
             </List>
           </Paper>
         </Grid>
@@ -263,7 +256,7 @@ const AdminDashboard = () => {
                       secondary={
                         <Box>
                           <Typography variant="body2" color="text.secondary">
-                            ${product.price} • {product.quantity} in stock
+                            {formatPrice(product.price)} • {product.quantity} in stock
                           </Typography>
                           <Typography variant="caption" color="primary.main">
                             {product.categories?.join(', ')}
