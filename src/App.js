@@ -8,6 +8,7 @@ import { CartProvider } from './contexts/CartContext';
 import AdminRoute from './components/Auth/AdminRoute';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminProducts from './pages/Admin/AdminProducts';
+import AdminOrders from './pages/Admin/AdminOrders';
 
 // Import components
 import ErrorBoundary from './components/ErrorBoundary';
@@ -176,6 +177,7 @@ function App() {
                     <Route path="/products" element={<Products />} />
                     <Route path="/products/category/:category" element={<Products />} />
                     <Route path="/product/:id" element={<ProductDetail />} />
+                    
                     {/* Admin Routes */}
                     <Route
                       path="/admin"
@@ -194,6 +196,16 @@ function App() {
                       }
                     />
                     <Route
+                      path="/admin/orders"
+                      element={
+                        <AdminRoute>
+                          <AdminOrders />
+                        </AdminRoute>
+                      }
+                    />
+                    
+                    {/* Protected Routes */}
+                    <Route
                       path="/cart"
                       element={
                         <ProtectedRoute>
@@ -201,7 +213,6 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
-                    
                     <Route
                       path="/checkout"
                       element={

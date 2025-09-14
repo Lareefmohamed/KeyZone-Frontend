@@ -215,6 +215,15 @@ const AdminDashboard = () => {
                   secondary="Add, edit, and remove products"
                 />
               </ListItem>
+              <ListItem component={Link} to="/admin/orders" sx={{ pl: 0, '&:hover': { bgcolor: 'rgba(255, 215, 0, 0.1)' } }}>
+                <ListItemIcon>
+                  <ShoppingCart color="primary" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Order Management" 
+                  secondary="View and manage customer orders"
+                />
+              </ListItem>
               
               
             </List>
