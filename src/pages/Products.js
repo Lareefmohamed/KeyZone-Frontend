@@ -18,7 +18,7 @@ const Products = () => {
   const [error, setError] = useState('');
   const [pagination, setPagination] = useState({});
   const [filters, setFilters] = useState({
-    category: '',
+    category: category || '',
     search: '',
     sortBy: 'createdAt',
     sortOrder: 'desc',
@@ -29,6 +29,7 @@ const Products = () => {
   // Valid categories
   const validCategories = ['Games', 'Softwares'];
 
+  // Handle category changes from URL
   useEffect(() => {
     // Validate category parameter
     if (category && !validCategories.includes(category)) {
@@ -36,18 +37,18 @@ const Products = () => {
       return;
     }
     
-    // Update filters based on category parameter
-    // This handles both when category exists and when it doesn't (all products)
-    setFilters(prev => ({ 
-      ...prev, 
-      category: category || '', // Clear category if undefined
-      page: 1 
+    // Set filters with the correct category immediately
+    setFilters(prev => ({
+      ...prev,
+      category: category || '',
+      page: 1
     }));
   }, [category, navigate]);
 
+  // Fetch products when filters change
   useEffect(() => {
     fetchProducts();
-  }, [filters.page, filters.sortBy, filters.sortOrder, filters.category]);
+  }, [filters]);
 
   const fetchProducts = async () => {
     try {
@@ -62,21 +63,25 @@ const Products = () => {
         sortOrder: filters.sortOrder
       };
 
-      // Add category filter if present
-      if (filters.category) {
+      // Add category filter if present - this is crucial
+      if (filters.category && filters.category.trim()) {
         queryParams.category = filters.category;
+        console.log('Adding category filter:', filters.category); // Debug log
       }
 
       // Add search filter if present
-      if (filters.search.trim()) {
+      if (filters.search && filters.search.trim()) {
         queryParams.search = filters.search.trim();
       }
+
+      console.log('Fetching products with params:', queryParams); // Debug log
 
       const response = await productService.getAllProducts(queryParams);
       
       if (response.data.success) {
         setProducts(response.data.data);
         setPagination(response.data.pagination);
+        console.log('Fetched products:', response.data.data.length, 'products'); // Debug log
       } else {
         setError('Failed to load products');
       }
@@ -89,24 +94,26 @@ const Products = () => {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters(prev => ({ 
+      ...prev, 
+      [key]: value,
+      page: key !== 'page' ? 1 : value // Reset page when other filters change
+    }));
   };
 
   const handleSearch = () => {
     setFilters(prev => ({ ...prev, page: 1 }));
-    fetchProducts();
   };
 
   const handleClear = () => {
-    const newFilters = {
+    setFilters({
       category: category || '', // Keep URL category or clear it
       search: '',
       sortBy: 'createdAt',
       sortOrder: 'desc',
       page: 1,
       limit: 12
-    };
-    setFilters(newFilters);
+    });
   };
 
   const handlePageChange = (event, page) => {
@@ -188,6 +195,15 @@ const Products = () => {
               ? 'Discover the latest digital game keys for PC, console, and mobile platforms'
               : 'Find professional software and productivity tools for your business needs'
             }
+          </Typography>
+        </Box>
+      )}
+
+      {/* Debug Info - Remove in production */}
+      {process.env.NODE_ENV === 'development' && (
+        <Box sx={{ mb: 2, p: 2, bgcolor: 'grey.900', borderRadius: 1 }}>
+          <Typography variant="caption" color="text.secondary">
+            Debug: URL Category: "{category}" | Filter Category: "{filters.category}" | Products: {products.length}
           </Typography>
         </Box>
       )}
