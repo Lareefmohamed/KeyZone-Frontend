@@ -1,9 +1,9 @@
 // src/components/Products/ProductCard.js
 import React, { useState } from 'react';
 import {
-  Card, CardContent, CardMedia, Typography, Box, Button, Chip, CardActions, Skeleton
+  Card, CardContent, CardMedia, Typography, Box, Button, Chip, CardActions, Skeleton, IconButton, Fade
 } from '@mui/material';
-import { ShoppingCart, Visibility, Star } from '@mui/icons-material';
+import { ShoppingCart, Visibility, Star, ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -15,6 +15,12 @@ const ProductCard = ({ product }) => {
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Get valid images array
+  const images = product.productImgs?.filter(img => img && img.trim()) || [];
+  const hasMultipleImages = images.length > 1;
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
@@ -51,6 +57,18 @@ const ProductCard = ({ product }) => {
 
   const handleViewProduct = () => {
     navigate(`/product/${product._id}`);
+  };
+
+  const handlePreviousImage = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+  };
+
+  const handleNextImage = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
   };
 
   const formatPrice = (price) => {
@@ -101,6 +119,8 @@ const ProductCard = ({ product }) => {
         }
       }}
       onClick={handleViewProduct}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image Section */}
       <Box sx={{ position: 'relative', height: 220, overflow: 'hidden' }}>
@@ -112,11 +132,12 @@ const ProductCard = ({ product }) => {
             sx={{ bgcolor: 'rgba(255, 215, 0, 0.1)' }}
           />
         )}
+        
         <CardMedia
           component="img"
           className="product-image"
           height="220"
-          image={!imageError ? (product.productImgs?.[0] || '/placeholder-image.jpg') : '/placeholder-image.jpg'}
+          image={!imageError ? (images[currentImageIndex] || '/placeholder-image.jpg') : '/placeholder-image.jpg'}
           alt={product.name}
           onLoad={() => setImageLoading(false)}
           onError={() => {
@@ -129,6 +150,114 @@ const ProductCard = ({ product }) => {
             display: imageLoading ? 'none' : 'block'
           }}
         />
+
+        {/* Image Navigation Arrows (only show on hover if multiple images) */}
+        {hasMultipleImages && isHovered && (
+          <>
+            <Fade in={true}>
+              <IconButton
+                sx={{
+                  position: 'absolute',
+                  left: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  bgcolor: 'rgba(0, 0, 0, 0.7)',
+                  color: 'primary.main',
+                  width: 32,
+                  height: 32,
+                  '&:hover': {
+                    bgcolor: 'rgba(0, 0, 0, 0.9)',
+                    transform: 'translateY(-50%) scale(1.1)'
+                  }
+                }}
+                onClick={handlePreviousImage}
+              >
+                <ArrowBackIos sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Fade>
+            <Fade in={true}>
+              <IconButton
+                sx={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  bgcolor: 'rgba(0, 0, 0, 0.7)',
+                  color: 'primary.main',
+                  width: 32,
+                  height: 32,
+                  '&:hover': {
+                    bgcolor: 'rgba(0, 0, 0, 0.9)',
+                    transform: 'translateY(-50%) scale(1.1)'
+                  }
+                }}
+                onClick={handleNextImage}
+              >
+                <ArrowForwardIos sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Fade>
+          </>
+        )}
+
+        {/* Image Indicators */}
+        {hasMultipleImages && (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 8,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              gap: 0.5,
+              bgcolor: 'rgba(0, 0, 0, 0.7)',
+              borderRadius: 2,
+              px: 1,
+              py: 0.5
+            }}
+          >
+            {images.map((_, index) => (
+              <Box
+                key={index}
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  bgcolor: index === currentImageIndex ? 'primary.main' : 'rgba(255, 255, 255, 0.5)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    bgcolor: index === currentImageIndex ? 'primary.main' : 'rgba(255, 255, 255, 0.8)'
+                  }
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setCurrentImageIndex(index);
+                }}
+              />
+            ))}
+          </Box>
+        )}
+
+        {/* Multiple Images Badge */}
+        {hasMultipleImages && (
+          <Chip
+            label={`${images.length} photos`}
+            size="small"
+            sx={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              bgcolor: 'rgba(0, 0, 0, 0.7)',
+              color: 'primary.main',
+              fontSize: '0.7rem',
+              height: 20,
+              '& .MuiChip-label': {
+                px: 1
+              }
+            }}
+          />
+        )}
         
         {/* Overlay for hover effects */}
         <Box

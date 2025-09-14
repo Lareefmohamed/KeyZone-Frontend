@@ -4,10 +4,10 @@ import {
   Container, Typography, Paper, Button, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, Grid, Box, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, IconButton, Chip, Alert,
-  FormControl, InputLabel, Select, MenuItem, FormHelperText
+  FormControl, InputLabel, Select, MenuItem, FormHelperText, Avatar
 } from '@mui/material';
 import {
-  Add, Edit, Delete, Save, Cancel, Image
+  Add, Edit, Delete, Save, Cancel, Image, Visibility
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import productService from '../../services/productService';
@@ -56,7 +56,7 @@ const AdminProducts = () => {
         price: product.price.toString(),
         quantity: product.quantity.toString(),
         categories: product.categories || [],
-        productImgs: product.productImgs || ['']
+        productImgs: product.productImgs?.length > 0 ? product.productImgs : ['']
       });
     } else {
       setEditingProduct(null);
@@ -96,10 +96,12 @@ const AdminProducts = () => {
   };
 
   const addImageField = () => {
-    setFormData(prev => ({
-      ...prev,
-      productImgs: [...prev.productImgs, '']
-    }));
+    if (formData.productImgs.length < 10) {
+      setFormData(prev => ({
+        ...prev,
+        productImgs: [...prev.productImgs, '']
+      }));
+    }
   };
 
   const removeImageField = (index) => {
@@ -120,6 +122,11 @@ const AdminProducts = () => {
       return 'Valid quantity is required';
     }
     if (formData.categories.length === 0) return 'At least one category is required';
+    
+    // Validate at least one valid image URL
+    const validImages = formData.productImgs.filter(img => img && img.trim());
+    if (validImages.length === 0) return 'At least one image URL is required';
+    
     return null;
   };
 
@@ -137,7 +144,7 @@ const AdminProducts = () => {
         price: Number(formData.price),
         quantity: Number(formData.quantity),
         categories: formData.categories,
-        productImgs: formData.productImgs.filter(img => img.trim())
+        productImgs: formData.productImgs.filter(img => img && img.trim())
       };
 
       if (editingProduct) {
@@ -167,6 +174,17 @@ const AdminProducts = () => {
     } catch (error) {
       setError('Failed to delete product');
     }
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(price);
+  };
+
+  const getValidImages = (productImgs) => {
+    return productImgs?.filter(img => img && img.trim()) || [];
   };
 
   if (user?.role !== 'admin') {
@@ -206,68 +224,104 @@ const AdminProducts = () => {
           <Table>
             <TableHead>
               <TableRow sx={{ bgcolor: 'primary.main' }}>
-                <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Name</TableCell>
+                <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Product</TableCell>
+                <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Images</TableCell>
                 <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Categories</TableCell>
                 <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Price</TableCell>
-                <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Quantity</TableCell>
+                <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Stock</TableCell>
                 <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {products.map((product) => (
-                <TableRow key={product._id} hover>
-                  <TableCell>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                      {product.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                      {product.description.substring(0, 60)}...
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                      {product.categories?.map((category) => (
-                        <Chip 
-                          key={category} 
-                          label={category} 
+              {products.map((product) => {
+                const validImages = getValidImages(product.productImgs);
+                return (
+                  <TableRow key={product._id} hover>
+                    <TableCell>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                        {product.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                        {product.description.substring(0, 60)}...
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {validImages.length > 0 && (
+                          <Avatar
+                            src={validImages[0]}
+                            alt={product.name}
+                            sx={{ width: 50, height: 50 }}
+                            variant="rounded"
+                          />
+                        )}
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                            {validImages.length} images
+                          </Typography>
+                          {validImages.length > 1 && (
+                            <Typography variant="caption" color="text.secondary">
+                              +{validImages.length - 1} more
+                            </Typography>
+                          )}
+                        </Box>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                        {product.categories?.map((category) => (
+                          <Chip 
+                            key={category} 
+                            label={category} 
+                            size="small" 
+                            color={category === 'Games' ? 'error' : 'info'}
+                          />
+                        ))}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="h6" color="primary.main">
+                        {formatPrice(product.price)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={product.quantity} 
+                        color={product.quantity > 10 ? 'success' : product.quantity > 0 ? 'warning' : 'error'}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <IconButton 
                           size="small" 
-                          color={category === 'Games' ? 'error' : 'info'}
-                        />
-                      ))}
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="h6" color="primary.main">
-                      ${product.price}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={product.quantity} 
-                      color={product.quantity > 10 ? 'success' : product.quantity > 0 ? 'warning' : 'error'}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <IconButton 
-                        size="small" 
-                        color="primary"
-                        onClick={() => handleOpenDialog(product)}
-                      >
-                        <Edit />
-                      </IconButton>
-                      <IconButton 
-                        size="small" 
-                        color="error"
-                        onClick={() => handleDelete(product._id)}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
+                          color="primary"
+                          onClick={() => window.open(`/product/${product._id}`, '_blank')}
+                          title="View Product"
+                        >
+                          <Visibility />
+                        </IconButton>
+                        <IconButton 
+                          size="small" 
+                          color="primary"
+                          onClick={() => handleOpenDialog(product)}
+                          title="Edit Product"
+                        >
+                          <Edit />
+                        </IconButton>
+                        <IconButton 
+                          size="small" 
+                          color="error"
+                          onClick={() => handleDelete(product._id)}
+                          title="Delete Product"
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
@@ -341,34 +395,82 @@ const AdminProducts = () => {
                   <Image sx={{ mr: 1 }} />
                   Product Images
                 </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Add multiple images to showcase your product. The first image will be used as the main image.
+                </Typography>
                 {formData.productImgs.map((img, index) => (
-                  <Box key={index} sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
-                    <TextField
-                      fullWidth
-                      label={`Image URL ${index + 1}`}
-                      value={img}
-                      onChange={(e) => handleImageChange(index, e.target.value)}
-                      placeholder="https://example.com/image.jpg"
-                    />
-                    {formData.productImgs.length > 1 && (
-                      <IconButton 
-                        color="error" 
-                        onClick={() => removeImageField(index)}
-                        size="small"
-                      >
-                        <Delete />
-                      </IconButton>
+                  <Box key={index} sx={{ mb: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 1, mb: 1, alignItems: 'center' }}>
+                      <TextField
+                        fullWidth
+                        label={index === 0 ? `Main Image URL` : `Image URL ${index + 1}`}
+                        value={img}
+                        onChange={(e) => handleImageChange(index, e.target.value)}
+                        placeholder="https://example.com/image.jpg"
+                        helperText={index === 0 ? "This will be the main product image" : ""}
+                      />
+                      {formData.productImgs.length > 1 && (
+                        <IconButton 
+                          color="error" 
+                          onClick={() => removeImageField(index)}
+                          size="small"
+                          title="Remove image"
+                        >
+                          <Delete />
+                        </IconButton>
+                      )}
+                    </Box>
+                    {/* Image Preview */}
+                    {img && img.trim() && (
+                      <Box sx={{ 
+                        width: 100, 
+                        height: 100, 
+                        border: '2px solid rgba(255, 215, 0, 0.3)',
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: 'background.paper'
+                      }}>
+                        <img
+                          src={img}
+                          alt={`Preview ${index + 1}`}
+                          style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            objectFit: 'cover'
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'block';
+                          }}
+                        />
+                        <Typography 
+                          variant="caption" 
+                          color="error"
+                          sx={{ display: 'none', textAlign: 'center', p: 1 }}
+                        >
+                          Invalid image URL
+                        </Typography>
+                      </Box>
                     )}
                   </Box>
                 ))}
-                <Button 
-                  variant="outlined" 
-                  startIcon={<Add />} 
-                  onClick={addImageField}
-                  size="small"
-                >
-                  Add Image
-                </Button>
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <Button 
+                    variant="outlined" 
+                    startIcon={<Add />} 
+                    onClick={addImageField}
+                    size="small"
+                    disabled={formData.productImgs.length >= 10}
+                  >
+                    Add Image
+                  </Button>
+                  <Typography variant="caption" color="text.secondary">
+                    {formData.productImgs.length}/10 images ({formData.productImgs.filter(img => img && img.trim()).length} with URLs)
+                  </Typography>
+                </Box>
               </Grid>
             </Grid>
           </DialogContent>
