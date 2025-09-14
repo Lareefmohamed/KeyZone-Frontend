@@ -18,7 +18,7 @@ const Products = () => {
   const [error, setError] = useState('');
   const [pagination, setPagination] = useState({});
   const [filters, setFilters] = useState({
-    category: category || '',
+    category: '',
     search: '',
     sortBy: 'createdAt',
     sortOrder: 'desc',
@@ -36,9 +36,13 @@ const Products = () => {
       return;
     }
     
-    if (category) {
-      setFilters(prev => ({ ...prev, category, page: 1 }));
-    }
+    // Update filters based on category parameter
+    // This handles both when category exists and when it doesn't (all products)
+    setFilters(prev => ({ 
+      ...prev, 
+      category: category || '', // Clear category if undefined
+      page: 1 
+    }));
   }, [category, navigate]);
 
   useEffect(() => {
@@ -95,7 +99,7 @@ const Products = () => {
 
   const handleClear = () => {
     const newFilters = {
-      category: category || '',
+      category: category || '', // Keep URL category or clear it
       search: '',
       sortBy: 'createdAt',
       sortOrder: 'desc',
@@ -226,6 +230,11 @@ const Products = () => {
                   ? `Showing ${((pagination.current - 1) * filters.limit) + 1}-${Math.min(pagination.current * filters.limit, pagination.total)} of ${pagination.total} products`
                   : 'No products found'
                 }
+                {filters.category && (
+                  <Box component="span" sx={{ ml: 1, color: 'primary.main', fontWeight: 'bold' }}>
+                    in {filters.category}
+                  </Box>
+                )}
               </Typography>
             </Box>
           )}
@@ -248,7 +257,9 @@ const Products = () => {
               <Typography color="text.secondary" sx={{ mb: 3 }}>
                 {filters.search 
                   ? `No products match your search for "${filters.search}"`
-                  : 'No products are available in this category'
+                  : category 
+                  ? `No products are available in ${category}` 
+                  : 'No products are available'
                 }
               </Typography>
               {filters.search && (
