@@ -29,10 +29,9 @@ const Navbar = () => {
     navigate('/');
   };
 
+  // Fixed isActivePage function
   const isActivePage = (path) => {
-    if (path === '/products') {
-      return location.pathname === '/products' || location.pathname.startsWith('/products/category/');
-    }
+    // Exact match for all paths - no more broad matching
     return location.pathname === path;
   };
 
@@ -47,7 +46,7 @@ const Navbar = () => {
       }}
     >
       <Toolbar sx={{ minHeight: '70px !important', px: { xs: 2, md: 4 } }}>
-        {/* Logo */}
+        {/* Logo - KeyZone in bold */}
         <Box 
           component={Link} 
           to="/" 
@@ -84,7 +83,7 @@ const Navbar = () => {
           </Typography>
         </Box>
 
-        {/* Navigation Links */}
+        {/* Desktop Navigation Links */}
         <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
           <Button 
             color="inherit" 
@@ -170,16 +169,8 @@ const Navbar = () => {
             Products
           </Button>
         </Box>
-        {user?.role === 'admin' && (
-          <>
-            <Divider />
-            <MenuItem onClick={() => { navigate('/admin'); handleUserMenuClose(); }}>
-              <Dashboard sx={{ mr: 2, color: 'primary.main' }} />
-              Admin Dashboard
-            </MenuItem>
-          </>
-        )}
 
+        {/* Right side - Cart and User Menu */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}>
           <IconButton 
             color="inherit" 
@@ -274,6 +265,15 @@ const Navbar = () => {
                   <History sx={{ mr: 2, color: 'primary.main' }} />
                   Order History
                 </MenuItem>
+                {user?.role === 'admin' && (
+                  <>
+                    <Divider />
+                    <MenuItem onClick={() => { navigate('/admin'); handleUserMenuClose(); }}>
+                      <Dashboard sx={{ mr: 2, color: 'primary.main' }} />
+                      Admin Dashboard
+                    </MenuItem>
+                  </>
+                )}
                 <Divider />
                 <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
                   <Logout sx={{ mr: 2 }} />
