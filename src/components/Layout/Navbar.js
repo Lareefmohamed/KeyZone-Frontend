@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import {
   AppBar, Toolbar, Typography, Button, Box, IconButton, Badge, Menu, MenuItem, Avatar, Divider
 } from '@mui/material';
-import { ShoppingCart, Person, Logout, AccountBox, History, Store } from '@mui/icons-material';
+import { ShoppingCart, Person, Logout, AccountBox, History, Store, Dashboard } from '@mui/icons-material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
@@ -170,8 +170,16 @@ const Navbar = () => {
             Products
           </Button>
         </Box>
+        {user?.role === 'admin' && (
+          <>
+            <Divider />
+            <MenuItem onClick={() => { navigate('/admin'); handleUserMenuClose(); }}>
+              <Dashboard sx={{ mr: 2, color: 'primary.main' }} />
+              Admin Dashboard
+            </MenuItem>
+          </>
+        )}
 
-        {/* Cart and User Actions */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}>
           <IconButton 
             color="inherit" 

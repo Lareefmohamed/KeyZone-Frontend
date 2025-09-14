@@ -5,6 +5,9 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
+import AdminRoute from './components/Auth/AdminRoute';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import AdminProducts from './pages/Admin/AdminProducts';
 
 // Import components
 import ErrorBoundary from './components/ErrorBoundary';
@@ -173,6 +176,23 @@ function App() {
                     <Route path="/products" element={<Products />} />
                     <Route path="/products/category/:category" element={<Products />} />
                     <Route path="/product/:id" element={<ProductDetail />} />
+                    {/* Admin Routes */}
+                    <Route
+                      path="/admin"
+                      element={
+                        <AdminRoute>
+                          <AdminDashboard />
+                        </AdminRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/products"
+                      element={
+                        <AdminRoute>
+                          <AdminProducts />
+                        </AdminRoute>
+                      }
+                    />
                     <Route
                       path="/cart"
                       element={
@@ -181,6 +201,7 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
+                    
                     <Route
                       path="/checkout"
                       element={
