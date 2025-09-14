@@ -79,6 +79,66 @@ a:hover {
   background-clip: text;
 }
 
+/* Error message styling */
+.MuiAlert-root {
+  margin-bottom: 16px !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+}
+
+.MuiAlert-standardError {
+  background-color: rgba(244, 67, 54, 0.1) !important;
+  color: #ff5252 !important;
+  border: 1px solid rgba(244, 67, 54, 0.3) !important;
+}
+
+.MuiAlert-standardSuccess {
+  background-color: rgba(76, 175, 80, 0.1) !important;
+  color: #66bb6a !important;
+  border: 1px solid rgba(76, 175, 80, 0.3) !important;
+}
+
+.MuiAlert-standardWarning {
+  background-color: rgba(255, 152, 0, 0.1) !important;
+  color: #ffa726 !important;
+  border: 1px solid rgba(255, 152, 0, 0.3) !important;
+}
+
+.MuiAlert-standardInfo {
+  background-color: rgba(33, 150, 243, 0.1) !important;
+  color: #42a5f5 !important;
+  border: 1px solid rgba(33, 150, 243, 0.3) !important;
+}
+
+.MuiAlert-message {
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+.MuiAlert-action {
+  padding: 0 !important;
+  margin-left: 16px !important;
+}
+
+/* Form error styling */
+.MuiFormHelperText-root.Mui-error {
+  color: #ff5252 !important;
+  font-weight: 500 !important;
+  margin-top: 8px !important;
+}
+
+.MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline {
+  border-color: #ff5252 !important;
+  border-width: 2px !important;
+}
+
+/* Prevent form auto-refresh on error */
+form {
+  position: relative;
+}
+
 /* Custom animations */
 @keyframes fadeInUp {
   from {
@@ -115,15 +175,100 @@ a:hover {
   animation: goldShimmer 2s infinite;
 }
 
+/* Error message animation */
+@keyframes errorSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-message {
+  animation: errorSlide 0.3s ease-out;
+}
+
+/* Success message animation */
+@keyframes successPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-message {
+  animation: successPulse 0.5s ease-out;
+}
+
+/* Loading state styling */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(26, 26, 26, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+/* Button disabled state */
+.MuiButton-root:disabled {
+  opacity: 0.6 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Text field focus enhancement */
+.MuiOutlinedInput-root:focus-within .MuiOutlinedInput-notchedOutline {
+  border-color: #FFD700 !important;
+  border-width: 2px !important;
+  box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.2) !important;
+}
+
 /* Responsive design helpers */
 @media (max-width: 768px) {
   .mobile-hide {
     display: none !important;
+  }
+  
+  .MuiAlert-message {
+    font-size: 0.9rem !important;
+  }
+  
+  .MuiButton-root {
+    font-size: 0.9rem !important;
   }
 }
 
 @media (min-width: 769px) {
   .mobile-only {
     display: none !important;
+  }
+}
+
+/* High contrast mode for better visibility */
+@media (prefers-contrast: high) {
+  .MuiAlert-standardError {
+    background-color: rgba(244, 67, 54, 0.2) !important;
+    border-color: #ff5252 !important;
+  }
+  
+  .MuiAlert-message {
+    font-weight: 600 !important;
   }
 }
