@@ -199,15 +199,6 @@ const Products = () => {
         </Box>
       )}
 
-      {/* Debug Info - Remove in production */}
-      {process.env.NODE_ENV === 'development' && (
-        <Box sx={{ mb: 2, p: 2, bgcolor: 'grey.900', borderRadius: 1 }}>
-          <Typography variant="caption" color="text.secondary">
-            Debug: URL Category: "{category}" | Filter Category: "{filters.category}" | Products: {products.length}
-          </Typography>
-        </Box>
-      )}
-
       {/* Filters */}
       <ProductFilters
         filters={filters}
